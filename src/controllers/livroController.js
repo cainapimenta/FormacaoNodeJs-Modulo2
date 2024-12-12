@@ -1,77 +1,74 @@
 import livro from "../models/Livro.js";
 
-class LivroController{
+class LivroController {
 
-    static getAll = async (req, res) => {
+    static getAll = async (req, res, next) => {
         try {
             const entites = await livro.find({}).populate("autor").exec();
             res.status(200).json(entites);
         } catch (error) {
-            res
-                .status(500)
-                .json({ message: `${error.message} - falha na requisição` });
+            next(error);
         }
     }
 
-    static getById  = async (req, res) =>  {
+    static getById = async (req, res, next) => {
         try {
             const result = await livro.findById(req.params.id)
-                                        .populate("autor")
-                                        .exec();
+                .populate("autor")
+                .exec();
 
-            res.status(200).json(result);
+            if (result === null) {
+                res.status(404).json({ message: "Id do Livro não localizado." });
+            }
+            else {
+                res.status(200).json(result);
+            }
         } catch (error) {
-            res.status(500)
-                .json({ message: `[Falha ao buscar livro] ${error.message}`})
+            next(error);
         }
     }
 
-    static post = async (req, res) => {
+    static post = async (req, res, next) => {
         const body = req.body;
 
         try {
             const entity = await livro.create(body);
             res.status(201).json(entity);
         } catch (error) {
-            res.status(500)
-                .json({ message: `${error.message} - falha ao cadastrar livro` });
+            next(error);
         }
     }
 
-    static put = async (req, res) => {
+    static put = async (req, res, next) => {
         try {
             await livro.findByIdAndUpdate(req.params.id, req.body);
             res.status(204).send();
         } catch (error) {
-            res.status(500)
-                .json({ message: `[Falha ao atualizar o livro] ${error.message}`})
+            next(error);
         }
     }
 
-    static delete = async (req, res) => {
+    static delete = async (req, res, next) => {
         try {
             const id = req.params.id;
             await livro.findByIdAndDelete(id);
             res.status(204).send();
         } catch (error) {
-            res.status(500)
-                .json({ message: `[Falha ao deletar o livro] ${error.message}`})
+            next(error);
         }
     }
 
-    static getByParams = async (req, res) => {
+    static getByParams = async (req, res, next) => {
         const queries = req.query;
 
         try {
             const entites = await livro.find(queries)
-                                        .populate("autor")
-                                        .exec();
-                                        
+                .populate("autor")
+                .exec();
+
             res.status(200).json(entites);
         } catch (error) {
-            res
-                .status(500)
-                .json({ message: `${error.message} - falha na requisição` });
+            next(error);
         }
     }
 };
