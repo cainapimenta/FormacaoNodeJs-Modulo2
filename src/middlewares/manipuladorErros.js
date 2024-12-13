@@ -6,7 +6,14 @@ function manipuladorError(error, req, res, next) {
         res.status(400)
             .json({ message: "Um ou mais dados fornecidos estão incorretos." });
     }
-    else {
+    else if (error instanceof mongoose.Error.ValidationError){
+        const errorMessages = Object.values(error.errors)
+                                    .map(erro => erro.message)
+                                    .join("; ");
+        
+        res.status(400)
+            .json({ message: `Os seguintes erros foram encontrados: ${errorMessages}` });
+    } else {
         res.status(500)
             .json({ message: error.message })
     }

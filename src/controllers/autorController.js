@@ -29,7 +29,9 @@ class AutorController {
 
     static post = async (req, res, next) => {
         try {
+            
             const entity = await autor.create(req.body);
+
             res.status(201).json(entity);
         } catch (error) {
             next(error);
