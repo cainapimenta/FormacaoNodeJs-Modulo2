@@ -42,8 +42,13 @@ class LivroController {
 
     static put = async (req, res, next) => {
         try {
-            await livro.findByIdAndUpdate(req.params.id, req.body);
-            res.status(204).send();
+            const result = await livro.findByIdAndUpdate(req.params.id, req.body);
+
+            if (result === null) {
+                next(new NotFound("Livro não encontrado"));
+            } else {
+                res.status(204).send();
+            }
         } catch (error) {
             next(error);
         }
@@ -52,8 +57,13 @@ class LivroController {
     static delete = async (req, res, next) => {
         try {
             const id = req.params.id;
-            await livro.findByIdAndDelete(id);
-            res.status(204).send();
+            const result = await livro.findByIdAndDelete(id);
+
+            if (result === null) {
+                next(new NotFound("Livro não encontrado"));
+            } else {
+                res.status(204).send();
+            }
         } catch (error) {
             next(error);
         }

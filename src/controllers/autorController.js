@@ -30,7 +30,6 @@ class AutorController {
 
     static post = async (req, res, next) => {
         try {
-            
             const entity = await autor.create(req.body);
 
             res.status(201).json(entity);
@@ -41,8 +40,13 @@ class AutorController {
 
     static put = async (req, res, next) => {
         try {
-            await autor.findByIdAndUpdate(req.params.id, req.body);
-            res.status(204).send();
+            const result = await autor.findByIdAndUpdate(req.params.id, req.body);
+
+            if (result === null) {
+                next(new NotFound("Autor não localizado."));
+            } else {
+                res.status(204).send();
+            }
         } catch (error) {
             next(error);
         }
@@ -51,8 +55,13 @@ class AutorController {
     static delete = async (req, res, next) => {
         try {
             const id = req.params.id;
-            await autor.findByIdAndDelete(id);
-            res.status(204).send();
+            const result = await autor.findByIdAndDelete(id);
+
+            if (result === null) {
+                next(new NotFound("Autor não localizado."));
+            } else {
+                res.status(204).send();
+            }
         } catch (error) {
             next(error);
         }
