@@ -2,6 +2,7 @@ import express from "express";
 import connectarDatabase from "./config/dbConnect.js";
 import routes from "./routes/index.js";
 import manipuladorError from "./middlewares/manipuladorErros.js";
+import manipulador404 from "./middlewares/manipulador404.js";
 
 const connection = await connectarDatabase();
 
@@ -16,6 +17,8 @@ connection.once("open", () => {
 const app = express();
 app.use(express.json());
 routes(app);
+
+app.use(manipulador404);
 
 app.use(manipuladorError);
 
