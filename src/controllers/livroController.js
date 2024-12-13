@@ -70,10 +70,18 @@ class LivroController {
     }
 
     static getByParams = async (req, res, next) => {
-        const queries = req.query;
-
+        
         try {
-            const entites = await livro.find(queries)
+            const { editora, titulo, minPaginas, maxPaginas } = req.query;
+            const buscador = {};
+
+            if(editora) buscador.editora = { $regex: editora, $options: "i" };
+            if(titulo) buscador.titulo = { $regex: titulo, $options: "i" };
+            if(minPaginas && !maxPaginas) buscador.paginas = { $gte: minPaginas };
+            if(maxPaginas && !minPaginas) buscador.paginas = { $lte: maxPaginas };
+            if(maxPaginas && minPaginas) buscador.paginas = { $gte: minPaginas, $lte: maxPaginas };
+
+            const entites = await livro.find(buscador)
                 .populate("autor")
                 .exec();
 
