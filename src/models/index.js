@@ -1,5 +1,5 @@
 import "./globalValidator.js"
-import { autor } from "./Autor.js";
-import livro from "./Livro.js";
+import { autores } from "./Autor.js";
+import livros from "./Livro.js";
 
-export { autor, livro };
+export { autores, livros };
