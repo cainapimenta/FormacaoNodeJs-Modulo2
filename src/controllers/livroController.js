@@ -1,12 +1,27 @@
 import NotFound from "../errors/NotFound.js";
+import RequisitionError from "../errors/RequisitionError.js";
 import { autores, livros } from "../models/index.js";
 
 class LivroController {
 
     static getAll = async (req, res, next) => {
         try {
-            const entites = await livros.find({}).populate("autor").exec();
-            res.status(200).json(entites);
+            let { limite = 5, pagina = 1 } = req.query;
+
+            limite = parseInt(limite);
+            pagina = parseInt(pagina);
+
+            if (limite > 0 && pagina > 0) {
+                const entites = await livros.find({})
+                    .populate("autor")
+                    .skip((pagina - 1) * limite)
+                    .limit(limite)
+                    .exec();
+
+                res.status(200).json(entites);
+            } else {
+                next(new RequisitionError());
+            }
         } catch (error) {
             next(error);
         }
