@@ -6,16 +6,20 @@ class LivroController {
 
     static getAll = async (req, res, next) => {
         try {
-            let { limite = 5, pagina = 1 } = req.query;
+            let { limite = 10, pagina = 1, orderBy = "_id:-1" } = req.query;
+
+            let [fieldOrder, order] = orderBy.split(":");
 
             limite = parseInt(limite);
             pagina = parseInt(pagina);
+            order = parseInt(order);
 
             if (limite > 0 && pagina > 0) {
                 const entites = await livros.find({})
-                    .populate("autor")
+                    .sort({ [fieldOrder]: order })
                     .skip((pagina - 1) * limite)
                     .limit(limite)
+                    .populate("autor")
                     .exec();
 
                 res.status(200).json(entites);
