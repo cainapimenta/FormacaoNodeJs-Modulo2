@@ -1,31 +1,15 @@
 import NotFound from "../errors/NotFound.js";
-import RequisitionError from "../errors/RequisitionError.js";
 import { autores, livros } from "../models/index.js";
 
 class LivroController {
 
     static getAll = async (req, res, next) => {
         try {
-            let { limite = 10, pagina = 1, orderBy = "_id:-1" } = req.query;
+            const findLivros = livros.find();
 
-            let [fieldOrder, order] = orderBy.split(":");
+            req.result = findLivros;
 
-            limite = parseInt(limite);
-            pagina = parseInt(pagina);
-            order = parseInt(order);
-
-            if (limite > 0 && pagina > 0) {
-                const entites = await livros.find({})
-                    .sort({ [fieldOrder]: order })
-                    .skip((pagina - 1) * limite)
-                    .limit(limite)
-                    .populate("autor")
-                    .exec();
-
-                res.status(200).json(entites);
-            } else {
-                next(new RequisitionError());
-            }
+            next();
         } catch (error) {
             next(error);
         }
@@ -33,9 +17,7 @@ class LivroController {
 
     static getById = async (req, res, next) => {
         try {
-            const result = await livros.findById(req.params.id)
-                .populate("autor")
-                .exec();
+            const result = await livros.findById(req.params.id);
 
             if (result === null) {
                 next(new NotFound("Id do Livro não localizado."));
@@ -94,11 +76,10 @@ class LivroController {
             const buscador = await processSearch(req.query);
 
             if (buscador !== null) {
-                const entites = await livros.find(buscador)
-                    .populate("autor")
-                    .exec();
+                const entities = livros.find(buscador);
 
-                res.status(200).json(entites);
+                req.result = entities;
+                next();
             } else {
                 res.status(200).json([]);
             }
